@@ -1,20 +1,25 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import User from "../models/UserModel.js";
 
 const authController = {};
 
 // Register a new user
 authController.registerUser = async (req, res) => {
   try {
-    const { username, email, phone, password } = req.body;
+    console.log("🔵 REGISTER REQUEST BODY:", req.body);
 
-    if (!username || !email || !password) {
+    const { name, email, phone, password } = req.body;
+
+    if (!name || !email || !password) {
+      console.log("❌ Missing fields");
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
+      console.log("❌ User already exists:", email);
       return res.status(400).json({ message: "User already exists" });
     }
 
@@ -22,13 +27,15 @@ authController.registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
-      username,
+      name,
       email,
       phone,
       password: hashedPassword,
     });
 
     await newUser.save();
+
+    console.log("🟢 USER CREATED:", newUser._id);
 
     const token = jwt.sign(
       { id: newUser._id, role: newUser.role },
@@ -40,7 +47,7 @@ authController.registerUser = async (req, res) => {
       token,
       user: {
         id: newUser._id,
-        username: newUser.username,
+        name: newUser.name,
         email: newUser.email,
       },
     });
@@ -82,7 +89,7 @@ authController.loginUser = async (req, res) => {
       token,
       user: {
         id: user._id,
-        username: user.username,
+        name: user.name,
         email: user.email,
       },
     });

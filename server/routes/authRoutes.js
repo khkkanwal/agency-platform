@@ -13,4 +13,4 @@ router.post("/logout", authController.logout);
 // Get current user info
 router.get("/me", protect, authController.getCurrentUser);
 
-module.exports = router;
+export default router;

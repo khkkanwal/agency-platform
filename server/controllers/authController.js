@@ -7,48 +7,40 @@ const authController = {};
 // Register a new user
 authController.registerUser = async (req, res) => {
   try {
-    console.log("🔵 REGISTER REQUEST BODY:", req.body);
-
-    const { name, email, phone, password } = req.body;
-
-    if (!name || !email || !password) {
+    const { name, username, email, phone, password, role } = req.body;
+    if (!name || !username || !email || !password) {
       console.log("❌ Missing fields");
       return res.status(400).json({ message: "All fields are required" });
     }
-
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
       console.log("❌ User already exists:", email);
       return res.status(400).json({ message: "User already exists" });
     }
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
     const newUser = new User({
       name,
+      username,
       email,
       phone,
       password: hashedPassword,
+      role: role || "client",
     });
-
     await newUser.save();
-
     console.log("🟢 USER CREATED:", newUser._id);
-
     const token = jwt.sign(
       { id: newUser._id, role: newUser.role },
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );
-
     res.status(201).json({
       token,
       user: {
         id: newUser._id,
         name: newUser.name,
         email: newUser.email,
+        role: newUser.role,
       },
     });
   } catch (error) {
@@ -58,22 +50,27 @@ authController.registerUser = async (req, res) => {
 // Login a user
 authController.loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
 
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Email and password are required" });
+    if (!identifier || !password) {
+      return res.status(400).json({
+        message: "Email/Username and password are required",
+      });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
+    });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Compare password
+    console.log("USER FOUND:", user);
+
     const isMatch = await bcrypt.compare(password, user.password);
+
+    console.log("PASSWORD MATCH:", isMatch);
 
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -91,6 +88,7 @@ authController.loginUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {

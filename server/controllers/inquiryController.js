@@ -5,8 +5,8 @@ const inquiryController = {};
 // Create a new inquiry
 inquiryController.createInquiry = async (req, res) => {
   try {
-    const { name, email, message } = req.body;
-    const newInquiry = new Inquiry({ name, email, message });
+    const { user, email, message, status } = req.body;
+    const newInquiry = new Inquiry({ user, email, message, status });
     const savedInquiry = await newInquiry.save();
     res.status(201).json(savedInquiry);
   } catch (error) {
@@ -17,20 +17,24 @@ inquiryController.createInquiry = async (req, res) => {
 // Get all inquiries
 inquiryController.getAllInquiries = async (req, res) => {
   try {
-    const inquiries = await Inquiry.find();
+    const inquiries = await Inquiry.find()
+      .populate("user", "name email") // only needed fields
+      .sort({ createdAt: -1 }); // newest first
+
     res.status(200).json(inquiries);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 // Get a single inquiry by ID
 inquiryController.getInquiryById = async (req, res) => {
   try {
-    const inquiry = await Inquiry.findById(req.params.id);
+    const inquiry = await Inquiry.findById(req.params.id).populate("user"); // ✅ ADD THIS
+
     if (!inquiry) {
       return res.status(404).json({ message: "Inquiry not found" });
     }
+
     res.status(200).json(inquiry);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -40,10 +44,10 @@ inquiryController.getInquiryById = async (req, res) => {
 // Update an inquiry by ID
 inquiryController.updateInquiry = async (req, res) => {
   try {
-    const { name, email, message } = req.body;
+    const { status } = req.body;
     const inquiry = await Inquiry.findByIdAndUpdate(
       req.params.id,
-      { name, email, message },
+      { status },
       { new: true },
     );
     if (!inquiry) {

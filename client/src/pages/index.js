@@ -11,3 +11,5 @@ export { default as Inquiries } from "./admin/Inquiries";
 export { default as ManageBookings } from "./admin/ManageBookings";
 export { default as ManagePortfolios } from "./admin/ManagePortfolios";
 export { default as ManageServices } from "./admin/ManageServices";
+export { default as ManageBlogs } from "./admin/ManageBlogs";
+export { default as AdminLayout } from "./admin/AdminLayout";

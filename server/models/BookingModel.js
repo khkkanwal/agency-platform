@@ -6,6 +6,10 @@ const bookingSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    email: {
+      type: String,
+      required: true,
+    },
     serviceId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Service",

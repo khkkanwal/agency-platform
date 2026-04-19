@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute";
 import {
   Home,
   Login,
@@ -11,6 +12,8 @@ import {
   ManageBookings,
   ManagePortfolios,
   ManageServices,
+  ManageBlogs,
+  AdminLayout,
 } from "../pages";
 
 function AppRoutes() {
@@ -24,11 +27,21 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/admin/inquiries" element={<Inquiries />} />
-        <Route path="/admin/manage-bookings" element={<ManageBookings />} />
-        <Route path="/admin/manage-portfolios" element={<ManagePortfolios />} />
-        <Route path="/admin/manage-services" element={<ManageServices />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute roleRequired="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="manage-services" element={<ManageServices />} />
+          <Route path="manage-portfolios" element={<ManagePortfolios />} />
+          <Route path="manage-bookings" element={<ManageBookings />} />
+          <Route path="manage-inquiries" element={<Inquiries />} />
+          <Route path="manage-blogs" element={<ManageBlogs />} />
+        </Route>
       </Routes>
     </Router>
   );

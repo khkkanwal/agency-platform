@@ -14,6 +14,11 @@ const blogSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    status: {
+      type: String,
+      enum: ["draft", "published"],
+      default: "draft",
+    },
     tags: [String],
   },
   { timestamps: true },

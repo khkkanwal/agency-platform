@@ -5,8 +5,24 @@ const portfolioController = {};
 // Create a new portfolio item
 portfolioController.createPortfolio = async (req, res) => {
   try {
-    const { title, description, imageUrl } = req.body;
-    const newPortfolio = new Portfolio({ title, description, imageUrl });
+    console.log("REQ BODY:", req.body); // 👈 ADD THIS
+
+    const { title, description, imageUrl, category, liveLink, githubLink } =
+      req.body;
+
+    if (!category) {
+      return res.status(400).json({ message: "Category is required" });
+    }
+
+    const newPortfolio = new Portfolio({
+      title,
+      description,
+      imageUrl,
+      category,
+      liveLink,
+      githubLink,
+    });
+
     const savedPortfolio = await newPortfolio.save();
     res.status(201).json(savedPortfolio);
   } catch (error) {

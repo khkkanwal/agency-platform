@@ -28,8 +28,6 @@ function Register() {
         userData,
       );
 
-      console.log(res.data);
-
       // save token
       localStorage.setItem("token", res.data.token);
 

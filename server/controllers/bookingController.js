@@ -2,67 +2,86 @@ import Booking from "../models/BookingModel.js";
 
 const bookingController = {};
 
-// Create a new booking
+// CREATE
 bookingController.createBooking = async (req, res) => {
   try {
-    const { name, email, date } = req.body;
-    const newBooking = new Booking({ name, email, date });
-    const savedBooking = await newBooking.save();
-    res.status(201).json(savedBooking);
+    const { user, name, email, serviceId, date, time, status } = req.body;
+
+    const newBooking = new Booking({
+      user,
+      name,
+      email,
+      serviceId,
+      date,
+      time,
+      status: status || "pending",
+    });
+
+    const saved = await newBooking.save();
+
+    const populated = await Booking.findById(saved._id)
+      .populate("user", "name email")
+      .populate("serviceId", "title");
+
+    res.status(201).json(populated);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get all bookings
+// GET ALL
 bookingController.getAllBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find();
+    const bookings = await Booking.find()
+      .populate("user", "name email")
+      .populate("serviceId", "title")
+      .sort({ createdAt: -1 });
+
     res.status(200).json(bookings);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get a single booking by ID
+// GET ONE
 bookingController.getBookingById = async (req, res) => {
   try {
-    const booking = await Booking.findById(req.params.id);
+    const booking = await Booking.findById(req.params.id)
+      .populate("user", "name email")
+      .populate("serviceId", "title");
+
     if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
+      return res.status(404).json({ message: "Not found" });
     }
-    res.status(200).json(booking);
+
+    res.json(booking);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Update a booking by ID
+// UPDATE (status only safe)
 bookingController.updateBooking = async (req, res) => {
   try {
-    const { name, email, date } = req.body;
     const booking = await Booking.findByIdAndUpdate(
       req.params.id,
-      { name, email, date },
+      { status: req.body.status },
       { new: true },
-    );
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
-    res.status(200).json(booking);
+    )
+      .populate("user", "name email")
+      .populate("serviceId", "title");
+
+    res.json(booking);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Delete a booking by ID
+// DELETE
 bookingController.deleteBooking = async (req, res) => {
   try {
-    const booking = await Booking.findByIdAndDelete(req.params.id);
-    if (!booking) {
-      return res.status(404).json({ message: "Booking not found" });
-    }
-    res.status(200).json({ message: "Booking deleted successfully" });
+    await Booking.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

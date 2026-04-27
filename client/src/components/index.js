@@ -1,0 +1,11 @@
+export { default as About } from "./About";
+export { default as About2 } from "./About2";
+export { default as Button } from "./Button";
+export { default as Hero } from "./Hero";
+export { default as Navbar } from "./Navbar";
+export { default as ServiceCard } from "./ServiceCard";
+export { default as TopBar } from "./TopBar";
+export { default as Portfolio } from "./Portfolio";
+export { default as Blog } from "./Blog";
+export { default as Contact } from "./Contact";
+export { default as Footer } from "./Footer";

@@ -5,6 +5,8 @@ export { default as Portfolio } from "./user/Portfolio";
 export { default as Services } from "./user/Services";
 export { default as Contact } from "./user/Contact";
 export { default as Booking } from "./user/Booking";
+export { default as Blog } from "./user/Blog";
+export { default as SingleBlog } from "./user/SingleBlog";
 
 export { default as Dashboard } from "./admin/Dashboard";
 export { default as Inquiries } from "./admin/Inquiries";

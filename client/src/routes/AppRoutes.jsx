@@ -14,6 +14,8 @@ import {
   ManageServices,
   ManageBlogs,
   AdminLayout,
+  Blog,
+  SingleBlog,
 } from "../pages";
 
 function AppRoutes() {
@@ -26,6 +28,8 @@ function AppRoutes() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/blogs" element={<Blog />} />
+        <Route path="/blogs/:id" element={<SingleBlog />} />
 
         <Route
           path="/admin"
